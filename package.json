@@ -1,0 +1,49 @@
+{
+  "name": "connect-cloudant-store",
+  "version": "1.1.103",
+  "description": "Express session connector for IBM DataCache",
+  "main": "index.js",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "eslint": "^2.10.2",
+    "istanbul": "^0.4.5",
+    "mocha": "^2.5.2",
+    "pre-commit": "^1.1.3",
+    "sinon": "^1.17.6"
+  },
+  "dependencies": {
+    "cloudant": "1.7.*",
+    "express-session": "^1.13.0",
+    "debug": "^2.2.0",
+    "lodash": "^4.14.0"
+  },
+  "scripts": {
+    "test": "mocha test --recursive",
+    "coverage": "istanbul cover _mocha -- --recursive",
+    "lint": "eslint index.js test lib"
+  },
+  "pre-commit": [
+    "lint",
+    "test"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adriantanasa/connect-cloudant-store.git"
+  },
+  "keywords": [
+    "connect-cloudant-store",
+    "cloudant",
+    "connect cloudant",
+    "cloudant session",
+    "express-session",
+    "couchdb",
+    "bluemix",
+    "ibm"
+  ],
+  "author": "Adrian Tanasa <adrian_tanasa@yahoo.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/adriantanasa/connect-cloudant-store/issues"
+  },
+  "homepage": "https://github.com/adriantanasa/connect-cloudant-store#readme"
+}
