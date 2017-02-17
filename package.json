@@ -1,7 +1,7 @@
 {
   "name": "connect-cloudant-store",
-  "version": "1.1.103",
-  "description": "Express session connector for IBM DataCache",
+  "version": "0.0.1",
+  "description": "Express session storage connector for IBM Cloudant",
   "main": "index.js",
   "devDependencies": {
     "chai": "^3.5.0",
