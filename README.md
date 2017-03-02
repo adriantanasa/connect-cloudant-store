@@ -21,7 +21,7 @@ var session = require('express-session');
 var CloudantStore = require('connect-cloudant-store')(session);
 // example for local instance of cloudant - required params
 // database 'sessions' needs to be created prior to usage
-store = new CloudantStore(
+var store = new CloudantStore(
     {
         url: 'https://MYUSERNAME:MYPASSWORD@MYACCOUNT.cloudant.com'
     }
@@ -48,9 +48,9 @@ app.use(session({
 Standard usage for Bluemix environment/dev environment :
 
 ```javascript
-store = new CloudantStore(
+var store = new CloudantStore(
     {
-        instanceName: 'cloudant_service_name', 
+        instanceName: 'myCloudantServiceName', 
         vcapServices: JSON.parse(process.env.VCAP_SERVICES)
     }
 );
@@ -99,6 +99,22 @@ http://MYUSERNAME:MYPASSWORD@LOCALIP:LOCALPORT
 Allows to create the Cloudant client based on vcapServices JSON entry for your application and the name of the instance.
 
 See: https://github.com/cloudant/nodejs-cloudant#initialization
+
+Note: This will not work on *Bluemix Dedicated* because cloudant library is not searching by service name first, but instead by service type key first
+and second by service name (instanceName);
+
+You can use directly a cfenv npm module to get a working Cloudant url by service name:
+
+```javascript
+var svc = require('cfenv').getAppEnv().getServiceCreds('myCloudantServiceName');
+if (svc) {
+    store = new CloudantStore(
+        {
+            url: svc.url
+        }
+    );
+}
+```
 
 ### client
 Offers the mechanism to inject an instance of Cloudant() module as the client  -> replaces any of the Cloudant parameters above
