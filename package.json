@@ -1,6 +1,6 @@
 {
   "name": "connect-cloudant-store",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "description": "Node JS express-session storage connector for IBM Cloudant",
   "main": "index.js",
   "devDependencies": {
