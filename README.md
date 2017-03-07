@@ -13,7 +13,7 @@ The module is build on top of the cloudant npm module with promises plugin - the
 npm install connect-cloudant-store
 ```
 
-Using the CloudantStore session storage connector:
+Using the CloudantStore express-session storage:
 
 ```javascript
 
@@ -29,7 +29,6 @@ var store = new CloudantStore(
 
 store.on('connect', function() {
      // Cloudant Session store is ready for use
-     // you can call store.cleanupExpired() here or set it to be executed at an interval
 });
 
 store.on('disconnect', function() {
@@ -63,12 +62,12 @@ app.use(session({
 ```
 
 ### Using the session auto-clean feature
-The storage class has a auto-clean specific method that has to be called in your code. It could be called for example from a setIterval timer. It checks if there is already a view available for getting the expired sessions from store db, and if not, is trying to create it. There are related optional parameters to customize the name of the view/design, set a top limit for items deleted per cleanup call.
+The storage class has a auto-clean specific method that has to be called in your code. It could be trigger for example from a setIterval timer. It checks if there is already a view available for getting the expired sessions from store db, and if not, is trying to create it. There are related optional parameters to customize the name of the view/design, set a top limit for items deleted per cleanup call.
 
 ```javascript
 store.on('connect', function() {
-     // Cloudant Session store is ready for use
-     setInterval(function() { store.cleanupExpired(); }, 3600 * 1000); here or set it to be executed at an interval
+     // set cleanup job every other hour
+     setInterval(function() { store.cleanupExpired(); }, 3600 * 1000);
 });
 ```
 
@@ -84,8 +83,8 @@ var store = new CloudantStore({
         prefix: 'sess',
         ttl: 86400,
         disableTTLRefresh: false,
-        dbViewName: 'express_expired_sessions';
-        dbDesignName: 'expired_sessions';
+        dbViewName: 'express_expired_sessions',
+        dbDesignName: 'expired_sessions',
         dbRemoveExpMax: 100,
         // Cloudant() parameters used if 'client' is not provided
         url: undefined,
@@ -114,8 +113,7 @@ Allows to create the Cloudant client based on vcapServices JSON entry for your a
 
 See: https://github.com/cloudant/nodejs-cloudant#initialization
 
-**Note:** This will not work on *Bluemix Dedicated* because cloudant library is not searching by service name first, but instead by service type key first
-and second by service name (instanceName);
+**Note:** This will not work on *Bluemix Dedicated* because cloudant library is not searching by service name first, but instead by service type key first and second by service name (instanceName);
 
 You can use directly a cfenv npm module to get a working Cloudant url by service name:
 
