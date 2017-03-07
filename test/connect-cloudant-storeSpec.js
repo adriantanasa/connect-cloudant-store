@@ -26,13 +26,12 @@ describe('Testsuite - CloudantStore', function() {
         'get': function() {},
         'head': function() {},
         'insert': function() {},
-        'destroy': function() {}
+        'destroy': function() {},
+        'bulk': function() {},
+        'view': function() {}
     };
 
     var client = new Cloudant(goodClientParams);
-        // dbPutStub,
-        // dbDestroyStub,
-        // dbHeadStub;
 
     describe('TestSuite - CloudantStore', function() {
         beforeEach(function() {
@@ -42,7 +41,6 @@ describe('Testsuite - CloudantStore', function() {
             dbInsertStub = sinon.stub(dbStub, 'insert');
             dbDestroyStub = sinon.stub(dbStub, 'destroy');
             clientGetDbStub = sinon.stub(client, 'use').returns(dbStub);
-            // dbDestroyStub = sinon.stub(Cloudant.prototype, 'destroy');
         });
 
         afterEach(function() {
@@ -384,6 +382,229 @@ describe('Testsuite - CloudantStore', function() {
                 expect(stubCallback.called).to.be.true;
                 done();
             }, 0);
+        });
+    });
+
+    describe('TestSuite - CloudantStore - Cleanup Sessions', function() {
+        var dbViewStub,
+            dbBulkStub,
+            goodViewObj;
+
+        beforeEach(function() {
+            dbInfoStub = sinon.stub(dbStub, 'info');
+            dbInsertStub = sinon.stub(dbStub, 'insert');
+            dbViewStub = sinon.stub(dbStub, 'view');
+            dbBulkStub = sinon.stub(dbStub, 'bulk');
+            clientGetDbStub = sinon.stub(client, 'use').returns(dbStub);
+            goodViewObj = {
+                'total_rows': 1,
+                'rows': [
+                    {key: 'sess:sess-id-1', value: 'rev-id-1'},
+                    {key: 'sess:sess-id-2', value: 'rev-id-2'}
+                ]
+            };
+        });
+
+        afterEach(function() {
+            clientGetDbStub.restore();
+            dbInfoStub.restore();
+            dbViewStub.restore();
+            dbBulkStub.restore();
+            dbInsertStub.restore();
+        });
+
+        it('Testcase - initView - existing view resolves', function(done) {
+            dbInfoStub.returns(Promise.resolve({}));
+            dbViewStub.returns(Promise.resolve({}));
+            var store = new CloudantStore({
+                client: client
+            });
+
+            store.initView();
+
+            setTimeout(function() {
+                expect(dbViewStub.called).to.be.true;
+                expect(dbInsertStub.called).to.be.false;
+                done();
+            }, 0);
+        });
+
+        it('Testcase - initView - no view non 404 - fail', function(done) {
+            dbInfoStub.returns(Promise.resolve({}));
+            var error = {statusCode: 409, message: 'Some message'};
+            dbViewStub.returns(Promise.reject(error));
+            var store = new CloudantStore({
+                client: client
+            });
+
+            store.initView()
+            .then(function() {
+                expect(false).to.be.true;
+                done();
+            })
+            .catch(function(err) {
+                expect(dbViewStub.called).to.be.true;
+                expect(dbInsertStub.called).to.be.false;
+                expect(err).to.be.ok;
+                expect(err).to.deep.equal(error);
+                done();
+            });
+        });
+
+        it('Testcase - initView - no view 404 - success to create', function(done) {
+            dbInfoStub.returns(Promise.resolve({}));
+            var error = {statusCode: 404, message: 'not found'};
+            dbViewStub.returns(Promise.reject(error));
+            dbInsertStub.returns(Promise.resolve());
+            var store = new CloudantStore({
+                client: client
+            });
+
+            store.initView()
+            .then(function() {
+                expect(dbViewStub.called).to.be.true;
+                expect(dbInsertStub.called).to.be.true;
+                done();
+            })
+            .catch(function() {
+                expect(false).to.be.true;
+                done();
+            });
+        });
+
+        it('Testcase - initView - no view 404 - failed to create', function(done) {
+            dbInfoStub.returns(Promise.resolve({}));
+            var error = {statusCode: 404, message: 'not found'};
+            var insertErr = {statusCode: 500, message: 'generic error'};
+            dbViewStub.returns(Promise.reject(error));
+            dbInsertStub.returns(Promise.reject(insertErr));
+            var store = new CloudantStore({
+                client: client
+            });
+
+            store.initView()
+            .then(function() {
+                expect(false).to.be.true;
+                done();
+            })
+            .catch(function(err) {
+                expect(dbViewStub.called).to.be.true;
+                expect(dbInsertStub.called).to.be.true;
+                expect(err).to.deep.equal(insertErr);
+                done();
+            });
+        });
+
+        it('Testcase - cleanupExpired - initView failure', function(done) {
+            dbInfoStub.returns(Promise.resolve({}));
+            var error = {statusCode: 500, message: 'generic message'};
+            var store = new CloudantStore({
+                client: client
+            });
+
+            sinon.stub(store, 'initView').returns(Promise.reject(error));
+            store.cleanupExpired()
+            .then(function() {
+                expect(false).to.be.true;
+                done();
+            })
+            .catch(function(err) {
+                expect(err).to.deep.equal(error);
+                done();
+            });
+        });
+
+        it('Testcase - cleanupExpired - db.view failure', function(done) {
+            dbInfoStub.returns(Promise.resolve({}));
+            var error = {statusCode: 429, message: 'generic 429 message'};
+            dbViewStub.returns(Promise.reject(error));
+            var store = new CloudantStore({
+                client: client
+            });
+
+            sinon.stub(store, 'initView').returns(Promise.resolve());
+            store.cleanupExpired()
+            .then(function() {
+                expect(false).to.be.true;
+                done();
+            })
+            .catch(function(err) {
+                expect(err).to.deep.equal(error);
+                done();
+            });
+        });
+
+        it('Testcase - cleanupExpired - nothing to delete', function(done) {
+            dbInfoStub.returns(Promise.resolve({}));
+            dbViewStub.returns(Promise.resolve({'total_rows': 0, 'rows': []}));
+            var store = new CloudantStore({
+                client: client
+            });
+
+            sinon.stub(store, 'initView').returns(Promise.resolve());
+            store.cleanupExpired()
+            .then(function() {
+                expect(dbViewStub.called).to.be.true;
+                done();
+            })
+            .catch(function() {
+                expect(false).to.be.true;
+                done();
+            });
+        });
+
+        it('Testcase - cleanupExpired - expired rows - delete fails', function(done) {
+            var error = {statusCode: 500, message: 'generic 500 message'};
+            dbInfoStub.returns(Promise.resolve({}));
+            dbViewStub.returns(Promise.resolve(goodViewObj));
+            dbBulkStub.returns(Promise.reject(error));
+            var store = new CloudantStore({
+                client: client
+            });
+
+            sinon.stub(store, 'initView').returns(Promise.resolve());
+            store.cleanupExpired()
+            .then(function() {
+                expect(false).to.be.true;
+                done();
+            })
+            .catch(function(err) {
+                expect(err).to.deep.equal(error);
+                expect(dbViewStub.called).to.be.true;
+                expect(dbBulkStub.calledWith({
+                    docs: [
+                        {_id: 'sess:sess-id-1', _rev: 'rev-id-1', _deleted: true},
+                        {_id: 'sess:sess-id-2', _rev: 'rev-id-2', _deleted: true}
+                    ]
+                })).to.be.true;
+                done();
+            });
+        });
+
+        it('Testcase - cleanupExpired - expired rows - success delete', function(done) {
+            dbInfoStub.returns(Promise.resolve({}));
+            dbViewStub.returns(Promise.resolve(goodViewObj));
+            dbBulkStub.returns(Promise.resolve());
+            var store = new CloudantStore({
+                client: client
+            });
+
+            sinon.stub(store, 'initView').returns(Promise.resolve());
+            store.cleanupExpired()
+            .then(function() {
+                expect(dbViewStub.called).to.be.true;
+                expect(dbBulkStub.calledWith({
+                    docs: [
+                        {_id: 'sess:sess-id-1', _rev: 'rev-id-1', _deleted: true},
+                        {_id: 'sess:sess-id-2', _rev: 'rev-id-2', _deleted: true}
+                    ]
+                })).to.be.true;
+                done();
+            })
+            .catch(function() {
+                expect(false).to.be.true;
+                done();
+            });
         });
     });
 });
