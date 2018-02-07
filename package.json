@@ -12,9 +12,9 @@
     "sinon": "^1.17.6"
   },
   "dependencies": {
-    "cloudant": "1.7.*",
+    "cloudant": "^1.10.0",
+    "debug": "^2.6.9",
     "express-session": "^1.13.0",
-    "debug": "^2.2.0",
     "lodash": "^4.14.0"
   },
   "scripts": {
