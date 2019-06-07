@@ -2,7 +2,7 @@
 
 var expect = require('chai').expect,
     sinon = require('sinon'),
-    Cloudant = require('cloudant'),
+    Cloudant = require('@cloudant/cloudant'),
     session = require('express-session'),
     CloudantStore = require('../lib/connect-cloudant-store')(session);
 
@@ -60,7 +60,7 @@ describe('Testsuite - CloudantStore', function() {
                 error = err;
             }
             expect(error).not.to.be.null;
-            expect(error.message).to.deep.equal('invalid url');
+            expect(error.message).to.deep.equal('Invalid URL');
             expect(store).not.to.be.ok;
         });
 
@@ -121,6 +121,7 @@ describe('Testsuite - CloudantStore', function() {
             var stubCallback = sinon.spy();
             dbGetStub.returns(Promise.resolve(sessData));
             dbInfoStub.returns(Promise.resolve({}));
+            dbDestroyStub.returns(Promise.resolve({}));
             var store = new CloudantStore(Object.assign({client: client}, goodClientParams));
             store.get('key', stubCallback);
 
