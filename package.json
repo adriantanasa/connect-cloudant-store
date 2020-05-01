@@ -15,12 +15,15 @@
     "@cloudant/cloudant": "^4.1.0",
     "debug": "^2.6.9",
     "express-session": "^1.13.0",
-    "lodash": "^4.14.0"
+    "lodash": "^4.14.0",
+    "snyk": "^1.316.1"
   },
   "scripts": {
     "test": "mocha test --recursive",
     "coverage": "istanbul cover _mocha -- --recursive",
-    "lint": "eslint index.js test lib"
+    "lint": "eslint index.js test lib",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "pre-commit": [
     "lint",
@@ -45,5 +48,6 @@
   "bugs": {
     "url": "https://github.com/adriantanasa/connect-cloudant-store/issues"
   },
-  "homepage": "https://github.com/adriantanasa/connect-cloudant-store#readme"
+  "homepage": "https://github.com/adriantanasa/connect-cloudant-store#readme",
+  "snyk": true
 }
