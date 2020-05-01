@@ -1,0 +1,32 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.14.1
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  SNYK-JS-LODASH-567746:
+    - lodash:
+        patched: '2020-05-01T03:01:57.580Z'
+    - '@cloudant/cloudant > async > lodash':
+        patched: '2020-05-01T03:01:57.580Z'
+    - '@cloudant/cloudant > npm-cli-login > snyk > lodash':
+        patched: '2020-05-01T03:01:57.580Z'
+    - '@cloudant/cloudant > npm-cli-login > snyk > @snyk/dep-graph > lodash':
+        patched: '2020-05-01T03:01:57.580Z'
+    - '@cloudant/cloudant > npm-cli-login > snyk > inquirer > lodash':
+        patched: '2020-05-01T03:01:57.580Z'
+    - '@cloudant/cloudant > npm-cli-login > snyk > snyk-config > lodash':
+        patched: '2020-05-01T03:01:57.580Z'
+    - '@cloudant/cloudant > npm-cli-login > snyk > snyk-mvn-plugin > lodash':
+        patched: '2020-05-01T03:01:57.580Z'
+    - '@cloudant/cloudant > npm-cli-login > snyk > snyk-nodejs-lockfile-parser > lodash':
+        patched: '2020-05-01T03:01:57.580Z'
+    - '@cloudant/cloudant > npm-cli-login > snyk > snyk-nuget-plugin > lodash':
+        patched: '2020-05-01T03:01:57.580Z'
+    - '@cloudant/cloudant > npm-cli-login > snyk > snyk-php-plugin > lodash':
+        patched: '2020-05-01T03:01:57.580Z'
+    - '@cloudant/cloudant > npm-cli-login > snyk > @snyk/dep-graph > graphlib > lodash':
+        patched: '2020-05-01T03:01:57.580Z'
+    - '@cloudant/cloudant > npm-cli-login > snyk > snyk-go-plugin > graphlib > lodash':
+        patched: '2020-05-01T03:01:57.580Z'
+    - '@cloudant/cloudant > npm-cli-login > snyk > snyk-nodejs-lockfile-parser > graphlib > lodash':
+        patched: '2020-05-01T03:01:57.580Z'
