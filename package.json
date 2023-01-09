@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@cloudant/cloudant": "^4.1.0",
-    "debug": "^2.6.9",
+    "debug": "^3.1.0",
     "express-session": "^1.13.0",
     "lodash": "^4.14.0"
   },
